@@ -1,9 +1,9 @@
-# Agente basado en metas: quiere terminar 10 km en menos de 50 minutos.
-# Detecta el entorno con sus sensores y decide solo con if/else.
+# Agente basado en metas: Terminar 10 km en menos de 50 minutos.
+# Detecta el entorno con sus sensores.
 
 # Meta y plan del agente.
 META_MINUTOS = 50
-RITMO_PLAN_SEGUNDOS_POR_KILOMETRO = 300  # su plan: 5 minutos por km
+RITMO_PLAN_SEGUNDOS_POR_KILOMETRO = 300  # su plan: 5 minutos por km (está en segundos)
 TOLERANCIA_RETRASO_SEGUNDOS = 20  # cuanto puede atrasarse antes de apretar
 
 # Velocidades que usa segun la situacion (km/h).
@@ -15,8 +15,7 @@ VELOCIDAD_PARA_RECUPERAR_TIEMPO = 12.6
 
 # Limites de frecuencia cardiaca para sus decisiones.
 LIMITE_ALERTA_CORAZON = 170  # si pasa de aqui, baja el ritmo
-LIMITE_CORAZON_RECUPERADO = 165  # hasta aqui debe bajar para retomar el plan
-LIMITE_CORAZON_ALTO = 165  # si pasa de aqui, afloja un poco
+LIMITE_CORAZON_ALTO = 165  # hasta aqui debe bajar para retomar el plan
 
 
 class AgenteMetas:
@@ -35,7 +34,7 @@ class AgenteMetas:
                 self.en_alerta = True
             return "baja el ritmo"
         if self.en_alerta:
-            if frecuencia_cardiaca < LIMITE_CORAZON_RECUPERADO:
+            if frecuencia_cardiaca < LIMITE_CORAZON_ALTO:
                 self.en_alerta = False
             else:
                 self.velocidad = VELOCIDAD_RECUPERACION

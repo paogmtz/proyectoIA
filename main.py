@@ -3,10 +3,6 @@ from mundo import Mundo, DISTANCIA_META_KILOMETROS
 from agente import AgenteMetas, META_MINUTOS
 
 SEGUNDOS_POR_MINUTO = 60
-ENERGIA_INICIAL = 100
-LIMITE_FRECUENCIA_GASTO_ALTO = 165
-GASTO_ENERGIA_ALTO = 9  # ir muy revolucionado gasta mas
-GASTO_ENERGIA_NORMAL = 6
 
 
 def formato_minutos_segundos(segundos):
@@ -16,7 +12,6 @@ def formato_minutos_segundos(segundos):
 mundo = Mundo()
 agente = AgenteMetas()
 
-energia = ENERGIA_INICIAL
 frecuencia_acumulada_kilometro = 0
 segundos_kilometro = 0
 kilometro_actual = 0
@@ -32,16 +27,12 @@ while mundo.distancia_kilometros < DISTANCIA_META_KILOMETROS:
     # 3. El mundo avanza un segundo con esa decision.
     mundo.avanzar(agente.velocidad)
 
-    # Cada kilometro cerrado se calcula cuanta energia gasto.
+    # Cada kilometro cerrado se muestra su frecuencia media.
     frecuencia_acumulada_kilometro += frecuencia_cardiaca
     segundos_kilometro += 1
     if int(mundo.distancia_kilometros) > kilometro_actual:
         frecuencia_media = frecuencia_acumulada_kilometro / segundos_kilometro
-        if frecuencia_media > LIMITE_FRECUENCIA_GASTO_ALTO:
-            energia -= GASTO_ENERGIA_ALTO
-        else:
-            energia -= GASTO_ENERGIA_NORMAL
-        print(f"Km {kilometro_actual + 1}: FC media {frecuencia_media:.0f}, energia {energia}%")
+        print(f"Km {kilometro_actual + 1}: FC media {frecuencia_media:.0f}")
         kilometro_actual += 1
         frecuencia_acumulada_kilometro = 0
         segundos_kilometro = 0
@@ -49,7 +40,7 @@ while mundo.distancia_kilometros < DISTANCIA_META_KILOMETROS:
 print(f"\nTiempo final: {formato_minutos_segundos(mundo.tiempo_segundos)} (meta: menos de 50:00)")
 print(f"FC maxima: {mundo.frecuencia_cardiaca_maxima} bpm")
 print(f"Alertas de bajar el ritmo: {agente.numero_alertas}")
-if mundo.tiempo_segundos < META_MINUTOS * SEGUNDOS_POR_MINUTO and energia > 0:
+if mundo.tiempo_segundos < META_MINUTOS * SEGUNDOS_POR_MINUTO:
     print("META CUMPLIDA")
 else:
     print("META NO CUMPLIDA")
