@@ -10,3 +10,5 @@ pyproject.toml
 uv.lock
 # Sistema
 .DS_Store
+# Presentaciones (archivo local pesado, no va al repo)
+Presentaciones de IA--3.pdf
