@@ -1,56 +1,52 @@
-# Agente basado en metas: Terminar 10 km en menos de 50 minutos.
-# Detecta el entorno con sus sensores.
+# Agente basado en metas: recorrer 10 km en menos de 50 minutos.
+# Solo puede hacer 3 acciones: acelerar, mantener el ritmo o bajar el ritmo.
+# Decide con if/elif/else a partir de lo que percibe.
 
-# Meta y plan del agente.
 META_MINUTOS = 50
-RITMO_PLAN_SEGUNDOS_POR_KILOMETRO = 300  # su plan: 5 minutos por km (está en segundos)
-TOLERANCIA_RETRASO_SEGUNDOS = 20  # cuanto puede atrasarse antes de apretar
+SEGUNDOS_POR_KILOMETRO_PLAN = 296  # referencia: 4:56 por km, un poco menos
+# de 5 minutos para llegar a la meta con margen
+LIMITE_FRECUENCIA_ALTA = 170
 
-# Velocidades que usa segun la situacion (km/h).
-VELOCIDAD_INICIAL = 12.0
-VELOCIDAD_RITMO_PLAN = 12.4
-VELOCIDAD_AJUSTE_SUAVE = 12.2
-VELOCIDAD_RECUPERACION = 11.9
-VELOCIDAD_PARA_RECUPERAR_TIEMPO = 12.6
-
-# Limites de frecuencia cardiaca para sus decisiones.
-LIMITE_ALERTA_CORAZON = 170  # si pasa de aqui, baja el ritmo
-LIMITE_CORAZON_ALTO = 165  # hasta aqui debe bajar para retomar el plan
+PASO_VELOCIDAD = 0.6  # lo que sube o baja la velocidad con cada accion
+VELOCIDAD_MINIMA = 11.5  # para no bajar tanto que ya no alcance la meta
+VELOCIDAD_MAXIMA = 13.0
+VELOCIDAD_INICIAL = 12.4
 
 
 class AgenteMetas:
     def __init__(self):
         self.velocidad = VELOCIDAD_INICIAL
-        self.numero_alertas = 0
-        self.en_alerta = False  # para contar cada alerta una sola vez
+        # Estado interno: lo que recuerda de la iteracion anterior.
+        self.frecuencia_anterior = None
+        self.tendencia = "estable"
 
     def decidir(self, frecuencia_cardiaca, distancia, tiempo):
-        # Si el corazon pasa del limite, baja el ritmo y no lo sube
-        # hasta que se recupere (para no subir y bajar a cada rato).
-        if frecuencia_cardiaca > LIMITE_ALERTA_CORAZON:
-            self.velocidad = VELOCIDAD_RECUPERACION
-            if not self.en_alerta:
-                self.numero_alertas += 1
-                self.en_alerta = True
-            return "baja el ritmo"
-        if self.en_alerta:
-            if frecuencia_cardiaca < LIMITE_CORAZON_ALTO:
-                self.en_alerta = False
-            else:
-                self.velocidad = VELOCIDAD_RECUPERACION
-                return "baja el ritmo"
+        # Compara con la vez anterior para saber si va subiendo,
+        # bajando o estable. Solo se guarda como estado interno.
+        if self.frecuencia_anterior is None:
+            self.tendencia = "estable"
+        elif frecuencia_cardiaca > self.frecuencia_anterior:
+            self.tendencia = "subiendo"
+        elif frecuencia_cardiaca < self.frecuencia_anterior:
+            self.tendencia = "bajando"
+        else:
+            self.tendencia = "estable"
+        self.frecuencia_anterior = frecuencia_cardiaca
 
-        # Si va tarde respecto a su plan, acelera para recuperar.
-        tiempo_esperado = distancia * RITMO_PLAN_SEGUNDOS_POR_KILOMETRO
-        if tiempo > tiempo_esperado + TOLERANCIA_RETRASO_SEGUNDOS:
-            self.velocidad = VELOCIDAD_PARA_RECUPERAR_TIEMPO
-            return "acelera para recuperar"
+        # Si el corazon pasa del limite, baja el ritmo.
+        if frecuencia_cardiaca > LIMITE_FRECUENCIA_ALTA:
+            self.velocidad = max(
+                VELOCIDAD_MINIMA, self.velocidad - PASO_VELOCIDAD
+            )
+            return "bajar el ritmo"
 
-        # Si el corazon va alto aunque vaya a tiempo, afloja un poco.
-        if frecuencia_cardiaca > LIMITE_CORAZON_ALTO:
-            self.velocidad = VELOCIDAD_AJUSTE_SUAVE
-            return "afloja un poco"
+        # Si va retrasado respecto a su plan, acelera.
+        tiempo_esperado = distancia * SEGUNDOS_POR_KILOMETRO_PLAN
+        if tiempo > tiempo_esperado:
+            self.velocidad = min(
+                VELOCIDAD_MAXIMA, self.velocidad + PASO_VELOCIDAD
+            )
+            return "acelerar"
 
-        # Si todo va bien, sigue el ritmo del plan.
-        self.velocidad = VELOCIDAD_RITMO_PLAN
-        return "mantiene el ritmo"
+        # Si va bien, mantiene el ritmo.
+        return "mantener el ritmo"

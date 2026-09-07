@@ -1,4 +1,4 @@
-# Simula la carrera segundo a segundo: el agente percibe, decide y el mundo avanza.
+# Carrera simulada: el agente percibe, decide y el mundo avanza.
 from mundo import Mundo, DISTANCIA_META_KILOMETROS
 from agente import AgenteMetas, META_MINUTOS
 
@@ -6,40 +6,42 @@ SEGUNDOS_POR_MINUTO = 60
 
 
 def formato_minutos_segundos(segundos):
-    return f"{int(segundos // SEGUNDOS_POR_MINUTO)}:{int(segundos % SEGUNDOS_POR_MINUTO):02d}"
+    minutos = segundos // SEGUNDOS_POR_MINUTO
+    resto = segundos % SEGUNDOS_POR_MINUTO
+    return f"{minutos}:{resto:02d}"
 
 
+# 1. Se crea el mundo.
 mundo = Mundo()
+
+# 2. Se crea el agente.
 agente = AgenteMetas()
 
-frecuencia_acumulada_kilometro = 0
-segundos_kilometro = 0
-kilometro_actual = 0
-
+# 7. Se repite hasta recorrer los 10 km.
 while mundo.distancia_kilometros < DISTANCIA_META_KILOMETROS:
-    # 1. El agente percibe el entorno con sus sensores.
+    # 3. Se obtiene la frecuencia cardiaca del sensor.
     frecuencia_cardiaca = mundo.sensor_frecuencia_cardiaca()
-    distancia = mundo.sensor_distancia()
 
-    # 2. El agente decide que hacer para acercarse a su meta.
-    agente.decidir(frecuencia_cardiaca, distancia, mundo.tiempo_segundos)
+    # 4 y 5. Se le da al agente frecuencia, distancia y tiempo, y decide.
+    accion = agente.decidir(
+        frecuencia_cardiaca, mundo.distancia_kilometros, mundo.tiempo_segundos
+    )
 
-    # 3. El mundo avanza un segundo con esa decision.
+    # 6. El mundo avanza un segundo con la velocidad elegida.
     mundo.avanzar(agente.velocidad)
 
-    # Cada kilometro cerrado se muestra su frecuencia media.
-    frecuencia_acumulada_kilometro += frecuencia_cardiaca
-    segundos_kilometro += 1
-    if int(mundo.distancia_kilometros) > kilometro_actual:
-        frecuencia_media = frecuencia_acumulada_kilometro / segundos_kilometro
-        print(f"Km {kilometro_actual + 1}: FC media {frecuencia_media:.0f}")
-        kilometro_actual += 1
-        frecuencia_acumulada_kilometro = 0
-        segundos_kilometro = 0
+    # Se muestra informacion cada minuto, no cada segundo.
+    if mundo.tiempo_segundos % SEGUNDOS_POR_MINUTO == 0:
+        minutos = mundo.tiempo_segundos // SEGUNDOS_POR_MINUTO
+        print(
+            f"Tiempo: {minutos} min | "
+            f"Distancia: {mundo.distancia_kilometros:.2f} km | "
+            f"FC: {frecuencia_cardiaca} bpm | "
+            f"Acción: {accion}"
+        )
 
-print(f"\nTiempo final: {formato_minutos_segundos(mundo.tiempo_segundos)} (meta: menos de 50:00)")
-print(f"FC maxima: {mundo.frecuencia_cardiaca_maxima} bpm")
-print(f"Alertas de bajar el ritmo: {agente.numero_alertas}")
+print(f"\nTiempo final: {formato_minutos_segundos(mundo.tiempo_segundos)}")
+print(f"Distancia recorrida: {mundo.distancia_kilometros:.2f} km")
 if mundo.tiempo_segundos < META_MINUTOS * SEGUNDOS_POR_MINUTO:
     print("META CUMPLIDA")
 else:
