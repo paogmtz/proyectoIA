@@ -32,7 +32,8 @@ class RunnerBody:
         self.ultima_fc_bpm = fisiologia.FC_REPOSO_BPM
 
         # --- Datos acumulados para el reporte final ---
-        self._fc_acumulada = 0.0        # suma de FC real de todos los segundos
+        self._fc_acumulada = 0.0        # suma de FC real del kilómetro en curso
+        self._segs_km = 0               # segundos del kilómetro en curso
         self._fc_por_km = []            # FC media real de cada kilómetro cerrado
         self.fc_maxima_real = 0.0       # pico de FC alcanzado en toda la carrera
 
@@ -63,15 +64,17 @@ class RunnerBody:
             self.velocidad_actual, self.pendiente_actual, self.fatiga_bpm()
         )
         self._fc_acumulada += self.ultima_fc_bpm
+        self._segs_km += 1
         self.fc_maxima_real = max(self.fc_maxima_real, self.ultima_fc_bpm)
 
-        # Si cerramos un kilómetro, guardamos su FC media real.
+        # Si cerramos un kilómetro, guardamos la FC media real DE ESE km
+        # (se divide entre los segundos de ese kilómetro, no del total).
         if len(self._fc_por_km) < recorrido.TOTAL_KM:
             if self.distancia_km >= len(self._fc_por_km) + 1:
-                media_km = self._fc_acumulada / self.tiempo_s  # media histórica
+                media_km = self._fc_acumulada / max(1, self._segs_km)
                 self._fc_por_km.append(media_km)
                 self._fc_acumulada = 0.0
-                self.tiempo_km_inicio = self.tiempo_s
+                self._segs_km = 0
 
     # ------------------------------------------------------------------
     # Estado meteorológico ... de reporte.
