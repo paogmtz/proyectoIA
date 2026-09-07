@@ -3,6 +3,10 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+# Entorno de trabajo
 .idea/
+.vscode/
 pyproject.toml
 uv.lock
+# Sistema
+.DS_Store
