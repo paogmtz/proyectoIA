@@ -44,7 +44,7 @@ class Usuario:
         if self.condicion == 'hipertension':
             factor*= 0.85  
         elif self.condicion == 'asma':
-            factor*¨= 0.90  
+            factor*= 0.90  
         else: # 'ninguna'
             factor*= 1.0   # Sin reducción
         return factor
