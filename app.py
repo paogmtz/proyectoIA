@@ -326,36 +326,58 @@ class AgenteRunningApp(QMainWindow):
 
         return widget
 
-    def mostrar_resumen(self):
+   def mostrar_resumen(self):
         distancia = self.mundo.distancia_kilometros
-        tiempo_seg = self.mundo.tiempo_segundos
+        tiempo_seg = int(self.mundo.tiempo_segundos)
         minutos = tiempo_seg // 60
         segundos = tiempo_seg % 60
 
         distancia_meta = self.usuario.distancia_km
+        tiempo_meta_seg = int(self.usuario.tiempo_min * 60)
+        
         porcentaje_cumplido = min(100, (distancia / distancia_meta) * 100)
         meta_lograda = porcentaje_cumplido >= 100
 
+        # Bloque de información extra dependiendo del resultado
+        extra_info = ""
+
         if meta_lograda:
-            self.lbl_resumen_titulo.setText(
-                f"Meta Cumplida"
-            )
+            self.lbl_resumen_titulo.setText("Meta Cumplida")
             self.lbl_resumen_titulo.setStyleSheet(
                 "font-size: 18px; font-weight: bold; color: #28a745;"
             )
+            
+            # Cálculos de tiempo de sobra
+            tiempo_sobrante = max(0, tiempo_meta_seg - tiempo_seg)
+            min_meta = tiempo_meta_seg // 60
+            seg_meta = tiempo_meta_seg % 60
+            min_sobra = tiempo_sobrante // 60
+            seg_sobra = tiempo_sobrante % 60
+            
+            extra_info = f"""
+            <b>Tiempo Esperado:</b> {min_meta:02d}:{seg_meta:02d} min<br>
+            <b>Tiempo de Sobra:</b> {min_sobra:02d}:{seg_sobra:02d} min<br>
+            """
         else:
-            self.lbl_resumen_titulo.setText(
-                "Sesión finalizada"
-            )
+            self.lbl_resumen_titulo.setText("Sesión finalizada")
             self.lbl_resumen_titulo.setStyleSheet(
                 "font-size: 18px; font-weight: bold; color: #dc3545;"
             )
+            
+            # Cálculos de distancia faltante
+            distancia_faltante = max(0.0, distancia_meta - distancia)
+            
+            extra_info = f"""
+            <b>Distancia Objetivo:</b> {distancia_meta:.2f} km<br>
+            <b>Distancia Faltante:</b> {distancia_faltante:.2f} km<br>
+            """
 
         resumen_txt = f"""
         <b>Atleta:</b> {self.usuario.nombre}<br>
         <b>Porcentaje de la Sesión Completado:</b> {porcentaje_cumplido:.1f}%<br>
         <b>Distancia Recorrida:</b> {distancia:.2f} km de {distancia_meta:.2f} km<br>
         <b>Tiempo Utilizado:</b> {minutos:02d}:{segundos:02d} min<br>
+        {extra_info}
         """
         self.lbl_resumen_detalles.setText(resumen_txt)
         self.stacked_widget.setCurrentIndex(3)
