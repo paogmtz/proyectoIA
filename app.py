@@ -325,7 +325,6 @@ class AgenteRunningApp(QMainWindow):
         layout.addWidget(btn_inicio)
 
         return widget
-
    def mostrar_resumen(self):
         distancia = self.mundo.distancia_kilometros
         tiempo_seg = int(self.mundo.tiempo_segundos)
