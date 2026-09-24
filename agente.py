@@ -5,7 +5,7 @@ class Usuario:
         self.nombre = nombre
         self.edad = edad
         
-        niveles_validos = ['principiante', 'intermedio', 'avanzado']
+        niveles_validos = ['principiante', 'intermedio', 'avanzado','experto']
         condiciones_validas = ['hipertension', 'asma']
 
         # Validación y normalización de nivel
@@ -94,7 +94,8 @@ class Usuario:
         penalizacion = {
             "principiante": 6.0,
             "intermedio": 5.0,
-            "avanzado": 4.0
+            "avanzado": 4.0,
+            "experto":4.0
         }[self.nivel]
 
         if self.edad > 50:
