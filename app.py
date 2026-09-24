@@ -1,7 +1,10 @@
 import sys
 from PySide6.QtCore import QTimer, Qt
-from PySide6.QtWidgets import QApplication, QCheckBox, QComboBox, QFormLayout, QHBoxLayout, QLabel, QLineEdit, QMainWindow 
-from PySide6.QtWidgets import QMessageBox,  QProgressBar, QPushButton, QStackedWidget, QVBoxLayout, QWidget
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFormLayout, 
+                               QHBoxLayout, QLabel, QLineEdit, QMainWindow, 
+                               QMessageBox, QProgressBar, QPushButton, 
+                               QStackedWidget, QVBoxLayout, QWidget)
+
 from agente import Usuario
 from mundo import Mundo
 
@@ -33,7 +36,6 @@ class AgenteRunningApp(QMainWindow):
         self.stacked_widget.addWidget(self.crear_pagina_reto())
         self.stacked_widget.addWidget(self.crear_pagina_carrera())
         self.stacked_widget.addWidget(self.crear_pagina_resumen())
-
 
     # Primera pantalla formulario
     def crear_pagina_formulario(self):
@@ -89,7 +91,7 @@ class AgenteRunningApp(QMainWindow):
             if edad <= 0 or edad > 100:
                 raise ValueError()
         except ValueError:
-            QMessageBox.warning(self, "Error de Entrada", "ingresa una edad válida")
+            QMessageBox.warning(self, "Error de Entrada", "Ingresa una edad válida")
             return
 
         # Validar casilla de autorización
@@ -132,15 +134,15 @@ class AgenteRunningApp(QMainWindow):
         <b>Atleta:</b> {self.usuario.nombre}<br>
         <b>Edad:</b> {self.usuario.edad} años<br>
         <b>Nivel:</b> {self.usuario.nivel.capitalize()}<br>
-        <b>Condición Médica:</b> {condicion_texto}<br></span><br>
-        <b>Meta Propuesta:</b></span><br>
+        <b>Condición Médica:</b> {condicion_texto}<br><br>
+        <b>Meta Propuesta:</b><br>
         <b>Distancia:</b> {self.usuario.distancia_km:.1f} km<br>
         <b>Tiempo Estimado:</b> {self.usuario.tiempo_min} minutos
         """
         self.lbl_detalles_reto.setText(texto_reto)
         self.stacked_widget.setCurrentIndex(1)
 
-    #reto calculado
+    # Reto calculado
     def crear_pagina_reto(self):
         widget = QWidget()
         layout = QVBoxLayout(widget)
@@ -288,7 +290,7 @@ class AgenteRunningApp(QMainWindow):
         self.timer.stop()
         self.mostrar_resumen()
 
-    #Página de término
+    # Página de término
     def crear_pagina_resumen(self):
         widget = QWidget()
         layout = QVBoxLayout(widget)
@@ -325,7 +327,8 @@ class AgenteRunningApp(QMainWindow):
         layout.addWidget(btn_inicio)
 
         return widget
-   def mostrar_resumen(self):
+
+    def mostrar_resumen(self):
         distancia = self.mundo.distancia_kilometros
         tiempo_seg = int(self.mundo.tiempo_segundos)
         minutos = tiempo_seg // 60
@@ -380,6 +383,7 @@ class AgenteRunningApp(QMainWindow):
         """
         self.lbl_resumen_detalles.setText(resumen_txt)
         self.stacked_widget.setCurrentIndex(3)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
