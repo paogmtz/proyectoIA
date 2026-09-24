@@ -5,7 +5,7 @@ class Usuario:
         self.nombre = nombre
         self.edad = edad
         
-        niveles_validos = ['principiante', 'intermedio', 'avanzado', 'experto']
+        niveles_validos = ['principiante', 'intermedio', 'avanzado']
         condiciones_validas = ['hipertension', 'asma']
 
         # Validación y normalización de nivel
@@ -40,13 +40,13 @@ class Usuario:
         return 0.65
 
     def obtener_factor_condicion(self):
-        # Si presenta ambas condiciones, los factores se combinan
-        factor = 1.0
-        if 'hipertension' in self.condiciones:
-            factor *= 0.85
-        if 'asma' in self.condiciones:
-            factor *= 0.90
-        return factor
+        #los factores son aproximados médicos
+        if self.condicion == 'hipertension':
+            return 0.85  
+        elif self.condicion == 'asma':
+            return 0.90  
+        else: # 'ninguna'
+            return 1.0   # Sin reducción
 
     def calcular_fc_objetivo(self):
         intensidad_final = self.factor_nivel * self.factor_condicion
@@ -94,8 +94,7 @@ class Usuario:
         penalizacion = {
             "principiante": 6.0,
             "intermedio": 5.0,
-            "avanzado": 4.0,
-            "experto": 4.0,
+            "avanzado": 4.0
         }[self.nivel]
 
         if self.edad > 50:
