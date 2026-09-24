@@ -42,11 +42,12 @@ class Usuario:
     def obtener_factor_condicion(self):
         #los factores son aproximados médicos
         if self.condicion == 'hipertension':
-            return 0.85  
+            factor*= 0.85  
         elif self.condicion == 'asma':
-            return 0.90  
+            factor*¨= 0.90  
         else: # 'ninguna'
-            return 1.0   # Sin reducción
+            factor*= 1.0   # Sin reducción
+        return factor
 
     def calcular_fc_objetivo(self):
         intensidad_final = self.factor_nivel * self.factor_condicion
