@@ -1,52 +1,44 @@
-# Mundo simulado: solo tiene tiempo, distancia y frecuencia cardiaca.
-# El unico sensor es el de frecuencia cardiaca.
-# La distancia y el tiempo son variables del entorno, no sensores.
-
 import random
 
-FRECUENCIA_CARDIACA_INICIAL = 150
-FRECUENCIA_CARDIACA_MINIMA = 150  # corriendo, las pulsaciones no bajan de aqui
-FRECUENCIA_CARDIACA_MAXIMA = 185
-
-# Velocidad a la que las pulsaciones se mantienen estables.
+FRECUENCIA_CARDIACA_MINIMA = 60
+FRECUENCIA_CARDIACA_MAXIMA = 195
 VELOCIDAD_EQUILIBRIO = 12.0
 
-# Cada segundo se sortea si la frecuencia cardiaca cambia o se mantiene.
-# Sube de 0 a 1 y baja de 0 a 2: el cuerpo se recupera mas rapido
-# de lo que se cansa.
 CAMBIO_MINIMO = 0
 CAMBIO_MAXIMO_SUBIDA = 1
 CAMBIO_MAXIMO_BAJADA = 2
 
-DISTANCIA_META_KILOMETROS = 10
 SEGUNDOS_POR_HORA = 3600
 
 
 class Mundo:
-    def __init__(self):
+    def __init__(self, usuario, fc_inicial: int = 75):
+        self.usuario = usuario
         self.tiempo_segundos = 0
         self.distancia_kilometros = 0.0
-        self.frecuencia_cardiaca = FRECUENCIA_CARDIACA_INICIAL
+        self.distancia_meta_km = usuario.distancia_km
+        self.frecuencia_cardiaca = fc_inicial
 
-    def sensor_frecuencia_cardiaca(self):
-        return self.frecuencia_cardiaca
+    def sensor_frecuencia_cardiaca(self) -> int:
+        return round(self.frecuencia_cardiaca)
 
-    def avanzar(self, velocidad):
+    def avanzar(self, velocidad: float):
         self.tiempo_segundos += 1
         self.distancia_kilometros += velocidad / SEGUNDOS_POR_HORA
 
-        # Mas rapido que el equilibrio -> tiende a subir.
-        # Mas lento que el equilibrio -> tiende a bajar.
-        if velocidad >= VELOCIDAD_EQUILIBRIO:
-            self.frecuencia_cardiaca += random.randint(
-                CAMBIO_MINIMO, CAMBIO_MAXIMO_SUBIDA
-            )
-        else:
-            self.frecuencia_cardiaca -= random.randint(
-                CAMBIO_MINIMO, CAMBIO_MAXIMO_BAJADA
-            )
+        # Valor al que tenderían las pulsaciones a esta velocidad.
+        # A 11 km/h, tienden a la frecuencia objetivo de ESTE usuario.
+        frecuencia_deseada = 75 + (
+            self.usuario.fc_objetivo - 75
+        ) * (velocidad / 11.0)
 
-        if self.frecuencia_cardiaca > FRECUENCIA_CARDIACA_MAXIMA:
-            self.frecuencia_cardiaca = FRECUENCIA_CARDIACA_MAXIMA
-        if self.frecuencia_cardiaca < FRECUENCIA_CARDIACA_MINIMA:
-            self.frecuencia_cardiaca = FRECUENCIA_CARDIACA_MINIMA
+        # Las pulsaciones se acercan poco a poco; no saltan inmediatamente.
+        self.frecuencia_cardiaca += (
+            frecuencia_deseada - self.frecuencia_cardiaca
+        ) * 0.05
+
+        # Límites de la simulación.
+        self.frecuencia_cardiaca = max(
+            60,
+            min(self.frecuencia_cardiaca, self.usuario.fc_maxima)
+        )
