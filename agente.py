@@ -68,10 +68,22 @@ class Usuario:
             distancia = 8.0
             ritmo_min_km = 5.5  # 5.5 min por km
 
-        # 2. Ajuste por edad (> 50 años)
-        if self.edad > 50:
+        # 2. Ajuste por edad 
+        if self.edad >= 90:
+            distancia *= 0.40
+            ritmo_min_km *= 2.5  # 150% más lento (se convierte en caminata muy suave)
+        elif self.edad >= 80:
+            distancia *= 0.50
+            ritmo_min_km *= 2.0  # 100% más lento
+        elif self.edad >= 70:
+            distancia *= 0.65
+            ritmo_min_km *= 1.5  # 50% más lento
+        elif self.edad >= 60:
+            distancia *= 0.75
+            ritmo_min_km *= 1.3  # 30% más lento
+        elif self.edad > 50:
             distancia *= 0.85
-
+            ritmo_min_km *= 1.15 # 15% más lento
         # 3. Ajustes por condiciones médicas
         if 'asma' in self.condiciones:
             distancia *= 0.80     # Se reduce distancia para evitar hiperventilación
